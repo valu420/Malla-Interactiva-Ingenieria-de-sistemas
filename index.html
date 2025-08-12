@@ -18,7 +18,7 @@
   <script>
     const e = React.createElement;
 
-    // --- Datos de la malla (IDs = códigos de asignatura) ---
+    // Datos de la malla (IDs = códigos de asignatura) ---
     const COURSES = [
       // Semestre 1
       { id: '111023C', name: 'Matemáticas Básicas', sem: 1, prereqs: [] },
@@ -170,58 +170,58 @@
         return d;
       }, []);
 
-      return e('div', {className:'p-6 max-w-7xl mx-auto'},
-        e('header',{className:'flex items-center justify-between mb-6'},
-          e('h1',{className:'text-2xl font-bold'}, 'Malla Interactiva — Ingeniería (Programación)'),
-          e('div',{className:'flex gap-2'},
-            e('button',{onClick:resetAll, className:'px-3 py-1 rounded bg-white border hover:bg-gray-100'}, 'Reset'),
-            e('button',{onClick:exportProgress, className:'px-3 py-1 rounded bg-white border hover:bg-gray-100'}, 'Exportar progreso'),
-            e('label',{className:'px-3 py-1 rounded bg-white border cursor-pointer hover:bg-gray-100'},
-              'Importar',
-              e('input',{type:'file', accept:'application/json', style:{display:'none'}, onChange:(ev)=>importProgressFile(ev.target.files[0])})
-            )
-          )
-        ),
+    return e('div', {className:'p-6 max-w-7xl mx-auto bg-pink-50 min-h-screen'},
+  e('header',{className:'flex items-center justify-between mb-6'},
+    e('h1',{className:'text-2xl font-bold text-pink-700'}, 'Malla Interactiva — Ingeniería de Sistemas y Ciencias de la Computación'),
+    e('div',{className:'flex gap-2'},
+      e('button',{onClick:resetAll, className:'px-3 py-1 rounded bg-pink-100 border border-pink-300 hover:bg-pink-200'}, 'Reset'),
+      e('button',{onClick:exportProgress, className:'px-3 py-1 rounded bg-pink-100 border border-pink-300 hover:bg-pink-200'}, 'Exportar progreso'),
+      e('label',{className:'px-3 py-1 rounded bg-pink-100 border border-pink-300 cursor-pointer hover:bg-pink-200'},
+        'Importar',
+        e('input',{type:'file', accept:'application/json', style:{display:'none'}, onChange:(ev)=>importProgressFile(ev.target.files[0])})
+      )
+    )
+  ),
 
-        e('p',{className:'text-sm text-gray-600 mb-4'}, 'Haz click en un ramo desbloqueado para marcarlo como aprobado (se tacha). Los ramos bloqueados aparecen opacos.'),
+  e('p',{className:'text-sm text-pink-600 mb-4'}, 'Haz click en la materia que ya viste para desbloquear las siguientes 💡.'),
 
-        e('div',{className:'grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4'},
-          semesters.map(sem => (
-            e('section',{key:sem, className:'bg-white rounded-2xl shadow-sm p-4'},
-              e('h2',{className:'font-semibold mb-3'}, 'Semestre '+sem),
-              e('div',{className:'flex flex-col gap-2'},
-                COURSES.filter(c=>c.sem===sem).map(c=>{
-                  const unlocked = isUnlocked(c);
-                  const isDone = !!completed[c.id];
-                  const statusText = isDone ? 'Aprobado' : (unlocked ? 'Desbloqueado' : 'Bloqueado');
-                  const title = unlocked ? (dependents[c.id] ? ('Al aprobarlo desbloquea: '+dependents[c.id].join(', ')) : 'Sin dependientes') : ('Bloqueado. Prerrequisitos: '+(c.prereqs.join(', ')||'—'));
-                  return e('button',{
-                    key:c.id,
-                    onClick:()=>toggleCourse(c.id),
-                    disabled:!unlocked,
-                    title,
-                    className: 'text-left w-full p-3 rounded-lg transition-all border flex justify-between items-center ' +
-                      (unlocked ? 'cursor-pointer hover:shadow-md ' : 'opacity-40 cursor-not-allowed ') +
-                      (isDone ? 'line-through bg-green-50 border-green-200' : 'bg-white')
-                  },
-                    e('div', null, e('div',{className:'font-medium'}, c.name), e('div',{className:'text-xs text-gray-500'}, c.id)),
-                    e('div',{className:'text-sm text-gray-500'}, statusText)
-                  );
-                })
-              )
-            )
-          ))
-        ),
-
-        e('footer',{className:'mt-6 text-sm text-gray-600'},
-          e('strong',null,'Notas:'),
-          e('ul',{className:'list-disc ml-6'},
-            e('li',null, 'El estado se guarda localmente en ', e('code',null, STORAGE_KEY), '.'),
-            e('li',null, 'Puedes editar el archivo para cambiar la malla; los IDs deben mantenerse (códigos de asignatura).'),
-            e('li',null, 'Sube este archivo como ', e('code',null,'index.html'), ' a un repo y activa GitHub Pages.')
-          )
+  e('div',{className:'grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4'},
+    semesters.map(sem => (
+      e('section',{key:sem, className:'bg-white rounded-2xl shadow-md p-4 border border-pink-200'},
+        e('h2',{className:'font-semibold mb-3 text-pink-700'}, 'Semestre '+sem),
+        e('div',{className:'flex flex-col gap-2'},
+          COURSES.filter(c=>c.sem===sem).map(c=>{
+            const unlocked = isUnlocked(c);
+            const isDone = !!completed[c.id];
+            const statusText = isDone ? 'Aprobado' : (unlocked ? 'Desbloqueado' : 'Bloqueado');
+            const title = unlocked ? (dependents[c.id] ? ('Al aprobarlo desbloquea: '+dependents[c.id].join(', ')) : 'Sin dependientes') : ('Bloqueado. Prerrequisitos: '+(c.prereqs.join(', ')||'—'));
+            return e('button',{
+              key:c.id,
+              onClick:()=>toggleCourse(c.id),
+              disabled:!unlocked,
+              title,
+              className: 'text-left w-full p-3 rounded-lg transition-all border flex justify-between items-center ' +
+                (unlocked ? 'cursor-pointer hover:shadow-lg ' : 'opacity-40 cursor-not-allowed ') +
+                (isDone ? 'line-through bg-pink-100 border-pink-300' : 'bg-white border-pink-200')
+            },
+              e('div', null, e('div',{className:'font-medium text-pink-800'}, c.name), e('div',{className:'text-xs text-pink-500'}, c.id)),
+              e('div',{className:'text-sm text-pink-500'}, statusText)
+            );
+          })
         )
-      );
+      )
+    ))
+  ),
+
+  e('footer',{className:'mt-6 text-sm text-pink-600'},
+    e('strong',null,'Notas:'),
+    e('ul',{className:'list-disc ml-6'},
+      e('li',null, 'El estado se guarda localmente en ', e('code',null, STORAGE_KEY), '.'),
+      e('li',null, 'Puedes editar el archivo para cambiar la malla; los IDs deben mantenerse (códigos de asignatura).'),
+      e('li',null, 'Sube este archivo como ', e('code',null,'index.html'), ' a un repo y activa GitHub Pages.')
+    )
+  )
+);
     }
 
     ReactDOM.createRoot(document.getElementById('root')).render(e(App));
