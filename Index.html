@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Malla Interactiva - Ingeniería (Programación)</title>
+  <!-- Tailwind CDN (no build) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>html,body,#root{height:100%}</style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <div id="root" class="h-full"></div>
+
+  <!-- React + ReactDOM UMD (production) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <script>
+    const e = React.createElement;
+
+    // --- Datos de la malla (IDs = códigos de asignatura) ---
+    const COURSES = [
+      // Semestre 1
+      { id: '111023C', name: 'Matemáticas Básicas', sem: 1, prereqs: [] },
+      { id: '404002C', name: 'Deporte y Salud', sem: 1, prereqs: [] },
+      { id: '750012C', name: 'Fundamentos de programación Imperativa', sem: 1, prereqs: [] },
+      { id: '701002C', name: 'Taller de ingeniería I', sem: 1, prereqs: [] },
+      { id: '701001C', name: 'Inserción a la vida universitaria', sem: 1, prereqs: [] },
+      { id: '701003C', name: 'Introducción a la ingenieria', sem: 1, prereqs: [] },
+
+      // Semestre 2
+      { id: '111021C', name: 'Cálculo monovariable', sem: 2, prereqs: ['111023C'] },
+      { id: '111038C', name: 'Álgebra Lineal', sem: 2, prereqs: ['111023C'] },
+      { id: '750015C', name: 'Fundamentos de programación orientada a objetos', sem: 2, prereqs: ['750012C','701002C'] },
+      { id: '750004C', name: 'Matemáticas discretas I', sem: 2, prereqs: ['750012C'] },
+      { id: '204133C', name: 'Comprensión y producción de textos académicos generales', sem: 2, prereqs: [] },
+      { id: 'ELECT_C1', name: 'Electiva complementaria I', sem: 2, prereqs: [] },
+
+      // Semestre 3
+      { id: '111022C', name: 'Cálculo multivariable', sem: 3, prereqs: ['111021C'] },
+      { id: '106012C', name: 'Física I + Laboratorio', sem: 3, prereqs: ['111021C'] },
+      { id: '750014C', name: 'Fundamentos de programación orientada a eventos', sem: 3, prereqs: ['750015C'] },
+      { id: '750005C', name: 'Matemáticas Discretas II', sem: 3, prereqs: ['750004C'] },
+      { id: 'ELECT_C2', name: 'Electiva complementaria II', sem: 3, prereqs: [] },
+
+      // Semestre 4
+      { id: '761001C', name: 'Probabilidad y Estadística', sem: 4, prereqs: ['111021C'] },
+      { id: '111026C', name: 'Ecuaciones diferenciales', sem: 4, prereqs: ['111022C'] },
+      { id: '750013C', name: 'Fundamentos de programación funcional y concurrente', sem: 4, prereqs: ['750014C'] },
+      { id: '750001C', name: 'Sistemas operativos', sem: 4, prereqs: ['750014C'] },
+      { id: '750006C', name: 'Bases de datos', sem: 4, prereqs: ['750015C'] },
+
+      // Semestre 5
+      { id: '750016C', name: 'Simulación y computación numérica', sem: 5, prereqs: ['111038C','106012C','761001C','111026C'] },
+      { id: '750009C', name: 'Desarrollo de software I', sem: 5, prereqs: ['750006C'] },
+      { id: '750017C', name: 'Fundamentos de interpretación y compilación de lenguajes de programación', sem: 5, prereqs: ['750013C'] },
+      { id: '750008C', name: 'Análisis y diseño de algoritmos I', sem: 5, prereqs: ['750014C'] },
+      { id: '750010C', name: 'Fundamentos de redes', sem: 5, prereqs: ['750001C'] },
+      { id: '760016C', name: 'Ingeniería económica', sem: 5, prereqs: ['111022C'] },
+
+      // Semestre 6
+      { id: '750021C', name: 'Desarrollo de software II', sem: 6, prereqs: ['750009C'] },
+      { id: '750018C', name: 'Proyecto integrador I', sem: 6, prereqs: ['750009C'] },
+      { id: '750020C', name: 'Análisis y diseño de algoritmos II', sem: 6, prereqs: ['750008C'] },
+      { id: '750023C', name: 'Infraestructuras paralelas y distribuidas', sem: 6, prereqs: ['750010C'] },
+      { id: '750022C', name: 'Inteligencia artificial', sem: 6, prereqs: ['761001C','750013C'] },
+
+      // Semestre 7
+      { id: '730026C', name: 'Seminario en constitución, legislación y ética de la profesión', sem: 7, prereqs: [] },
+      { id: '750027C', name: 'Desarrollo de software III', sem: 7, prereqs: ['750021C'] },
+      { id: '750026C', name: 'Desarrollo de aplicaciones para dispositivos móviles', sem: 7, prereqs: ['750021C'] },
+      { id: '750024C', name: 'Ciberseguridad', sem: 7, prereqs: ['750016C','750010C'] },
+      { id: '750025C', name: 'Introducción a la ciencia de los datos', sem: 7, prereqs: ['750022C','750006C'] },
+
+      // Semestre 8
+      { id: 'ELECT_PROF1', name: 'Electiva Profesional I', sem: 8, prereqs: [] },
+      { id: '750031C', name: 'Introducción a la gestión de proyectos de software', sem: 8, prereqs: ['750021C'] },
+      { id: '750037C', name: 'Proyecto integrador II', sem: 8, prereqs: ['750018C','750025C'] },
+      { id: '750036C', name: 'Seminario de trabajo de grado', sem: 8, prereqs: ['750020C'] },
+      { id: '730078C', name: 'Impactos ambientales', sem: 8, prereqs: [] },
+
+      // Semestre 9
+      { id: 'ELECT_PROF2', name: 'Electiva profesional II', sem: 9, prereqs: [] },
+      { id: 'ELECT_PROF3', name: 'Electiva profesional III', sem: 9, prereqs: [] },
+      { id: '750032C', name: 'Innovación y emprendimiento empresarial', sem: 9, prereqs: ['750031C'] },
+      { id: '750038C', name: 'Trabajo de grado I', sem: 9, prereqs: ['750036C'] },
+      { id: '750040C', name: 'Diseño de contenido para interfaces de usuario', sem: 9, prereqs: [] },
+
+      // Semestre 10
+      { id: 'ELECT_PROF4', name: 'Electiva Profesional IV', sem: 10, prereqs: [] },
+      { id: '750039C', name: 'Trabajo de Grado II', sem: 10, prereqs: ['750038C'] },
+    ];
+
+    const STORAGE_KEY = 'malla_prog_completed_v1';
+
+    function App() {
+      const [completed, setCompleted] = React.useState(() => {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          return raw ? JSON.parse(raw) : {};
+        } catch (e) {
+          return {};
+        }
+      });
+
+      React.useEffect(() => {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(completed)); } catch (e) {}
+      }, [completed]);
+
+      const semesters = React.useMemo(() => {
+        return Array.from(new Set(COURSES.map(c => c.sem))).sort((a,b)=>a-b);
+      }, []);
+
+      const courseMap = React.useMemo(()=>{
+        const m = {};
+        COURSES.forEach(c=>m[c.id]=c);
+        return m;
+      }, []);
+
+      function isUnlocked(course){
+        if(!course.prereqs || course.prereqs.length===0) return true;
+        return course.prereqs.every(pid => completed[pid]);
+      }
+
+      function toggleCourse(id){
+        const c = courseMap[id];
+        if(!c) return;
+        if(!isUnlocked(c)) return;
+        setCompleted(prev=>({ ...prev, [id]: !prev[id] }));
+      }
+
+      function resetAll(){ setCompleted({}); }
+
+      function exportProgress(){
+        const data = { timestamp: new Date().toISOString(), completed };
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'malla_progress.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      function importProgressFile(file){
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev)=>{
+          try {
+            const obj = JSON.parse(ev.target.result);
+            if(obj && typeof obj.completed === 'object'){
+              setCompleted(obj.completed);
+              alert('Progreso importado correctamente.');
+            } else {
+              alert('Archivo no válido: falta campo "completed".');
+            }
+          } catch (err){ alert('Error leyendo el archivo: '+err.message); }
+        };
+        reader.readAsText(file);
+      }
+
+      // derive dependents for tooltips
+      const dependents = React.useMemo(()=>{
+        const d = {};
+        COURSES.forEach(c=>{
+          (c.prereqs||[]).forEach(p=>{ d[p]=d[p]||[]; d[p].push(c.id); });
+        });
+        return d;
+      }, []);
+
+      return e('div', {className:'p-6 max-w-7xl mx-auto'},
+        e('header',{className:'flex items-center justify-between mb-6'},
+          e('h1',{className:'text-2xl font-bold'}, 'Malla Interactiva — Ingeniería (Programación)'),
+          e('div',{className:'flex gap-2'},
+            e('button',{onClick:resetAll, className:'px-3 py-1 rounded bg-white border hover:bg-gray-100'}, 'Reset'),
+            e('button',{onClick:exportProgress, className:'px-3 py-1 rounded bg-white border hover:bg-gray-100'}, 'Exportar progreso'),
+            e('label',{className:'px-3 py-1 rounded bg-white border cursor-pointer hover:bg-gray-100'},
+              'Importar',
+              e('input',{type:'file', accept:'application/json', style:{display:'none'}, onChange:(ev)=>importProgressFile(ev.target.files[0])})
+            )
+          )
+        ),
+
+        e('p',{className:'text-sm text-gray-600 mb-4'}, 'Haz click en un ramo desbloqueado para marcarlo como aprobado (se tacha). Los ramos bloqueados aparecen opacos.'),
+
+        e('div',{className:'grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4'},
+          semesters.map(sem => (
+            e('section',{key:sem, className:'bg-white rounded-2xl shadow-sm p-4'},
+              e('h2',{className:'font-semibold mb-3'}, 'Semestre '+sem),
+              e('div',{className:'flex flex-col gap-2'},
+                COURSES.filter(c=>c.sem===sem).map(c=>{
+                  const unlocked = isUnlocked(c);
+                  const isDone = !!completed[c.id];
+                  const statusText = isDone ? 'Aprobado' : (unlocked ? 'Desbloqueado' : 'Bloqueado');
+                  const title = unlocked ? (dependents[c.id] ? ('Al aprobarlo desbloquea: '+dependents[c.id].join(', ')) : 'Sin dependientes') : ('Bloqueado. Prerrequisitos: '+(c.prereqs.join(', ')||'—'));
+                  return e('button',{
+                    key:c.id,
+                    onClick:()=>toggleCourse(c.id),
+                    disabled:!unlocked,
+                    title,
+                    className: 'text-left w-full p-3 rounded-lg transition-all border flex justify-between items-center ' +
+                      (unlocked ? 'cursor-pointer hover:shadow-md ' : 'opacity-40 cursor-not-allowed ') +
+                      (isDone ? 'line-through bg-green-50 border-green-200' : 'bg-white')
+                  },
+                    e('div', null, e('div',{className:'font-medium'}, c.name), e('div',{className:'text-xs text-gray-500'}, c.id)),
+                    e('div',{className:'text-sm text-gray-500'}, statusText)
+                  );
+                })
+              )
+            )
+          ))
+        ),
+
+        e('footer',{className:'mt-6 text-sm text-gray-600'},
+          e('strong',null,'Notas:'),
+          e('ul',{className:'list-disc ml-6'},
+            e('li',null, 'El estado se guarda localmente en ', e('code',null, STORAGE_KEY), '.'),
+            e('li',null, 'Puedes editar el archivo para cambiar la malla; los IDs deben mantenerse (códigos de asignatura).'),
+            e('li',null, 'Sube este archivo como ', e('code',null,'index.html'), ' a un repo y activa GitHub Pages.')
+          )
+        )
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+  </script>
+</body>
+</html>
